@@ -1,0 +1,26 @@
+{
+  "name": "resume-server",
+  "version": "1.0.0",
+  "description": "nodeJS server",
+  "main": "server.js",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "mongoose": "^4.7.6"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "test",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/imccausl/resume-server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/imccausl/resume-server/issues"
+  },
+  "homepage": "https://github.com/imccausl/resume-server#readme"
+}
