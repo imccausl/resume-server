@@ -2,14 +2,28 @@ const	http = require('http'),
 		path = require('path'),
 		express = require('express'),
 		mongoose = require('mongoose'),
-		db = mongoose.connect('mongodb://localhost/resume'),
 		Resume = require('./model/resumeModel')
 		bodyparser = require('body-parser'),
 		app = express(),
-		port = process.env.PORT || 8000;
+		port = process.env.OPENSHIFT_NODEJS_PORT || 8080,
+		ip_addr = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1',
+		connection_string = '127.0.0.1:27017/resume';
 		
-var		resumeRouter = require('./routes/resumeRoutes')(Resume);
-		
+var		resumeRouter = require('./routes/resumeRoutes')(Resume),
+		db = null;
+
+// connect to mongoDB
+
+if (process.env.OPENSHIFT_MONGODB_DB_PASSWORD) {
+	connection_string = process.env.OPENSHIFT_MONGODB_DB_USERNAME + ":" + 
+						process.env.OPENSHIFT_MONGODB_DB_PASSWORD + "@" +
+						process.env.OPENSHIFT_MONGODB_DB_HOST + ":" +
+						process.env.OPENSHIFT_MONGODB_DB_PORT + "/" +
+						process.env.OPENSHIFT_APP_NAME;
+}
+
+db = mongoose.connect(connection_string);
+
 
 /* resumeRouter.route('/:resumeId')
 	.get(function(req, res) {
