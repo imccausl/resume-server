@@ -6,10 +6,10 @@ const	http = require('http'),
 		bodyparser = require('body-parser'),
 		app = express(),
 		port = process.env.OPENSHIFT_NODEJS_PORT || 8080,
-		ip_addr = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1',
-		connection_string = '127.0.0.1:27017/resume';
+		ip_addr = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
 		
 var		resumeRouter = require('./routes/resumeRoutes')(Resume),
+		connection_string = '127.0.0.1:27017/resume',
 		db = null;
 
 // connect to mongoDB
@@ -19,7 +19,7 @@ if (process.env.OPENSHIFT_MONGODB_DB_PASSWORD) {
 						process.env.OPENSHIFT_MONGODB_DB_PASSWORD + "@" +
 						process.env.OPENSHIFT_MONGODB_DB_HOST + ":" +
 						process.env.OPENSHIFT_MONGODB_DB_PORT + "/" +
-						process.env.OPENSHIFT_APP_NAME;
+						process.env.OPENSHIFT_APP_NAME + "/resume";
 }
 
 db = mongoose.connect(connection_string);
@@ -49,14 +49,14 @@ app.use(bodyparser.urlencoded({extended:true}));
 app.use(bodyparser.json({ type: 'application/vnd.api+json' }));
 app.use(bodyparser.json())
 
-app.use('/api/resumes', resumeRouter);
+app.use('/v1/resumes', resumeRouter);
 
 		
 app.get('/', function(req, res) {
 	res.send('Server is working.');
 });
 
-app.listen(port, function(){
-	console.log('Server running on port: ' + port);
+app.listen(port, ip_addr, function(){
+	console.log('Server running on: ' + ip_addr + ':'+port );
 });
 

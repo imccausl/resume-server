@@ -4,7 +4,7 @@ var	mongoose = require('mongoose'),
 var resumeModel = new Schema( {
 			
 		
-			info: { 
+		info: { 
 			fullName: String,
 			description: String,
 			img: String,
@@ -84,8 +84,8 @@ var resumeModel = new Schema( {
 			content: [ { category: {type:String}, skills: {type:String} } ],
 			order: Number 
 		},
-		
-		metaData: {
+	
+		metadata: {
 			docName: String,
 			isPublic: {type: Boolean, default: false},
 			dateCreated: {type: Date, default: Date.now},
