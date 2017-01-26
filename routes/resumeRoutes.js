@@ -21,7 +21,15 @@ var routes = function(Resume) {
 			// store second query argument in resumeQuery variable
 			resumeQuery[Object.keys(query)[1]] = query[Object.keys(query)[1]];
 			
-			if (query['metadata.isPublic'] === 'true') {
+			if (query['public'] === 'true') {
+					
+					console.log(query);
+
+					query = {'metadata.isPublic':'true'};
+					
+					console.log("after:", query);
+				
+				
 					Resume.find(query, function(err, resume) {
 					
 					if (err) {
@@ -62,13 +70,16 @@ var routes = function(Resume) {
 				}
 			});
 		})
-		.patch(function (req, res) {
+		.put(function (req, res) {
 			Resume.findById(req.params.resumeId, function(err, resume) {
 				if(err) {
 					res.status(500).send(err);
 				} else {
 					
 					resume.info = req.body.info;
+					
+					console.log("Summary Looks Like:",req.body.summary);
+					
 					resume.summary = req.body.summary;
 					resume.experience = req.body.experience
 					resume.volunteerExperience = req.body.volunteerExperience;

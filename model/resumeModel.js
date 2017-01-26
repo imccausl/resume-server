@@ -24,8 +24,9 @@ var resumeModel = new Schema( {
 		},
 	    
 	    summary: { 
+		    _id: {type: String, required: true},
 		    title: {type: String, default: "Summary of Qualifications"},
-			content: [ { type: String } ],
+			content: [ { item: String } ],
 			order: Number 
 		},
 		
@@ -80,6 +81,7 @@ var resumeModel = new Schema( {
 		},
 		
 	    skills: { 
+		    id: {type: Schema.Types.ObjectId},
 		    title: {type: String, default: "Technical Skills"},
 			content: [ { category: {type:String}, skills: {type:String} } ],
 			order: Number 
@@ -88,8 +90,8 @@ var resumeModel = new Schema( {
 		metadata: {
 			docName: String,
 			isPublic: {type: Boolean, default: false},
-			dateCreated: {type: Date, default: Date.now},
-			dateModified: Date
+			dateCreated: {type: String, default: Date.now},
+			dateModified: String
 		}
 	
 
