@@ -2,61 +2,73 @@ const	http = require('http'),
 		path = require('path'),
 		express = require('express'),
 		mongoose = require('mongoose'),
-		Resume = require('./model/resumeModel')
 		bodyparser = require('body-parser'),
 		app = express(),
-		port = process.env.OPENSHIFT_NODEJS_PORT || 8080,
-		ip_addr = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
 		
-var		resumeRouter = require('./routes/resumeRoutes')(Resume),
-		connection_string = '127.0.0.1:27017/resume',
-		db = null;
+		// models
+		Resume = require('./models/resumeModel'),
+		User = require('./models/userModel'),
+		
+		// routes
+		resumeRouter = require('./routes/resumeRoutes')(Resume),
+		userRouter = require('./routes/userRoutes')(User),
+		
+		// connection strings
+		PORT = process.env.PORT || 8080,
+		IP_ADDR = process.env.IP || '127.0.0.1',
+		MONGO_SERVER = '127.0.0.1:27017/portfolioDB';
+		
+let 	mongo_db = null;
 
 // connect to mongoDB
-
-if (process.env.OPENSHIFT_MONGODB_DB_PASSWORD) {
-	connection_string = process.env.OPENSHIFT_MONGODB_DB_USERNAME + ":" + 
-						process.env.OPENSHIFT_MONGODB_DB_PASSWORD + "@" +
-						process.env.OPENSHIFT_MONGODB_DB_HOST + ":" +
-						process.env.OPENSHIFT_MONGODB_DB_PORT + "/" +
-						process.env.OPENSHIFT_APP_NAME + "/resume";
-}
-
-db = mongoose.connect(connection_string);
-
-
-/* resumeRouter.route('/:resumeId')
-	.get(function(req, res) {
-		Resume.findById(req.params.resumeId, function(err, resume) {
-			if (err) {
-				res.status(500).send(err);
-			} else {
-				res.json(resume);
-			}
-		})
-	}); */
+mongo_db = mongoose.connect(MONGO_SERVER);
 	
 // allow CORS 
-
-app.use(function(req,res,next) {
+app.use( (req,res,next) => {
 	res.header("Access-Control-Allow-Origin", "*");
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 	res.header("Access-Control-Allow-Methods", "PUT,PATCH,GET,POST");
+	
 	next();
 });
 
+// Middleware
 app.use(bodyparser.urlencoded({extended:true}));
-app.use(bodyparser.json({ type: 'application/vnd.api+json' }));
+app.use(bodyparser.json({ type: 'application/vnd.api+json' })); // headers for JSON API
 app.use(bodyparser.json())
 
+// Routing
 app.use('/v1/resumes', resumeRouter);
+app.use('/v1/users', userRouter);
 
 		
-app.get('/', function(req, res) {
-	res.send('Server is working.');
+app.get('/', (req, res) => {
+	res.send('API server is functioning.');
 });
 
-app.listen(port, ip_addr, function(){
-	console.log('Server running on: ' + ip_addr + ':'+port );
+app.listen(PORT, IP_ADDR, () => {
+	console.log('Server running on: ' + IP_ADDR + ':' + PORT );
+});
+
+
+// Mongoose Event Handlers
+mongoose.connection.on('error', (err) => {
+	console.log("A mongoose connection error occured:", err);
+});
+
+mongoose.connection.on('connected', () => {
+	console.log("Mongoose connected to server:", MONGO_SERVER);
+});
+
+mongoose.connection.on('disconnected', () => {
+	console.log("Mongoose disconnected")
+});
+
+// Handle closing the node server process
+process.on('SIGINT', () => {
+	mongoose.connection.close( () => {
+		console.log("App Terminated. Cleaning up...");
+		process.exit(0);
+	});
 });
 

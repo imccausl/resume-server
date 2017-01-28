@@ -3,17 +3,23 @@ const express = require('express');
 var routes = function(Resume) {
 	var resumeRouter = express.Router();
 	
-	resumeRouter.route('/')
+	resumeRouter.route('/new')
 		.post(function(req, res) {
 			var resume = new Resume(req.body);
 			
-			resume.save();
-			
-			// status code 201: Created.
-			res.status(201).send(resume);
-			
-			console.log("Resume added.");
-		})
+			resume.save( (err, resume) => {
+				if (err) {
+					res.status(500);
+					console.log("Error occured on post to route '/':", err);
+				} else {
+					res.status(201).json(resume);
+					console.log("Resume added.");
+				}
+			});
+	
+		});
+		
+	resumeRouter.route('/')
 		.get(function(req, res) {
 			var query = req.query,
 				resumeQuery = {};
@@ -21,6 +27,7 @@ var routes = function(Resume) {
 			// store second query argument in resumeQuery variable
 			resumeQuery[Object.keys(query)[1]] = query[Object.keys(query)[1]];
 			
+			console.log("")
 			if (query['public'] === 'true') {
 					
 					console.log(query);
@@ -64,13 +71,13 @@ var routes = function(Resume) {
 		.get(function (req, res) {
 			Resume.findById(req.params.resumeId, function(err, resume) {
 				if(err) {
-					res.status(500).send(err);
+					res.status(500).json({'error': err});
 				} else {	
 					res.json(resume);
 				}
 			});
 		})
-		.put(function (req, res) {
+		.patch(function (req, res) {
 			Resume.findById(req.params.resumeId, function(err, resume) {
 				if(err) {
 					res.status(500).send(err);
@@ -96,7 +103,7 @@ var routes = function(Resume) {
 							console.log(Error);
 						} else {
 							console.log("Saved ", req.params.resumeId);
-							res.status(200).send(resume);
+							res.status(200).json(resume);
 						}
 					});
 					
