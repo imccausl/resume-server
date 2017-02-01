@@ -3,32 +3,18 @@ const express = require('express');
 var routes = function(Resume) {
 	var resumeRouter = express.Router();
 	
-	resumeRouter.route('/new')
-		.post(function(req, res) {
-			var resume = new Resume(req.body);
-			
-			resume.save( (err, resume) => {
-				if (err) {
-					res.status(500);
-					console.log("Error occured on post to route '/':", err);
-				} else {
-					res.status(201).json(resume);
-					console.log("Resume added.");
-				}
-			});
-	
-		});
-		
 	resumeRouter.route('/')
-		.get(function(req, res) {
+		.get( (req, res) => {
 			var query = req.query,
 				resumeQuery = {};
+			
+			// get here should build the resume based on the user's profile
 			
 			// store second query argument in resumeQuery variable
 			resumeQuery[Object.keys(query)[1]] = query[Object.keys(query)[1]];
 			
 			console.log("")
-			if (query['public'] === 'true') {
+			if (query['public'] === 'true') { // if user is not logged in, return resume without private data (addr, ph)
 					
 					console.log(query);
 
@@ -60,10 +46,15 @@ var routes = function(Resume) {
 				});	
 			
 			} else {
-				res.status(401).json({'error':'401: Forbidden'});
+				res.status(401).json({'error':'401: Unauthorized'});
 				console.log("Resume request denied: user not authorized. Query:", query);
 			}
 			
+			
+		});
+		
+	resumeRouter.route('/new')
+		.post( (req, res) => {
 			
 		});
 			

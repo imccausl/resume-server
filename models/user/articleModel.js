@@ -7,4 +7,4 @@ const mongoose = require('mongoose'),
 			
 } );
 
-module.exports = mongoose.model('Article', articleModel);
+module.exports = articleModel;

@@ -1,5 +1,5 @@
 const mongoose = require('mongoose'),
-	  bulletListModel = require('./bulletListModel'),
+	  bulletListModel = require('./components/bulletListModel'),
 	  Schema = mongoose.Schema,
 	  
 	  sectionModel = new Schema( {	

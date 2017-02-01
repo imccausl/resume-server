@@ -1,74 +1,79 @@
-const	http = require('http'),
-		path = require('path'),
-		express = require('express'),
-		mongoose = require('mongoose'),
-		bodyparser = require('body-parser'),
-		app = express(),
-		
-		// models
-		Resume = require('./models/resumeModel'),
-		User = require('./models/userModel'),
-		
-		// routes
-		resumeRouter = require('./routes/resumeRoutes')(Resume),
-		userRouter = require('./routes/userRoutes')(User),
-		
-		// connection strings
-		PORT = process.env.PORT || 8080,
-		IP_ADDR = process.env.IP || '127.0.0.1',
-		MONGO_SERVER = '127.0.0.1:27017/portfolioDB';
-		
-let 	mongo_db = null;
+const express = require('express');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+const logger = require('morgan');
+const session = require('express-session');
+const Resume = require('./models/resumeModel');
+const User = require('./models/userModel');
+const resumeRouter = require('./routes/resumeRoutes')(Resume);
+const userRouter = require('./routes/userRoutes')(User, Resume);
 
-// connect to mongoDB
-mongo_db = mongoose.connect(MONGO_SERVER);
-	
-// allow CORS 
-app.use( (req,res,next) => {
-	res.header("Access-Control-Allow-Origin", "*");
-	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-	res.header("Access-Control-Allow-Methods", "PUT,PATCH,GET,POST");
-	
-	next();
+// connection strings
+const PORT = process.env.PORT || 8080;
+const IP_ADDR = process.env.IP || '127.0.0.1';
+const MONGO_SERVER = '127.0.0.1:27017/portfolioDB';
+
+const app = express();
+
+// allow CORS
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.header('Access-Control-Allow-Methods', 'PUT,PATCH,GET,POST');
+
+  next();
 });
 
 // Middleware
-app.use(bodyparser.urlencoded({extended:true}));
-app.use(bodyparser.json({ type: 'application/vnd.api+json' })); // headers for JSON API
-app.use(bodyparser.json())
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json({ type: 'application/vnd.api+json' })); // headers for JSON API
+app.use(bodyParser.json());
+
+app.use(cookieParser());
+app.use(session({
+	secret: 'cve2kc8vDAVY*xgATeMx8uKR[C6CLeF3{pf?@AYkePw78z]D.MT>C^a@HBA62g3V',
+	resave: true,
+	saveUnititiaized: true
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Routing
 app.use('/v1/resumes', resumeRouter);
 app.use('/v1/users', userRouter);
 
-		
 app.get('/', (req, res) => {
-	res.send('API server is functioning.');
+  res.send('API server is functioning.');
 });
 
+mongoose.connect(MONGO_SERVER);
+
 app.listen(PORT, IP_ADDR, () => {
-	console.log('Server running on: ' + IP_ADDR + ':' + PORT );
+  console.log(`Server running on: ${IP_ADDR}: ${PORT}`);
 });
 
 
 // Mongoose Event Handlers
 mongoose.connection.on('error', (err) => {
-	console.log("A mongoose connection error occured:", err);
+  console.log('A mongoose connection error occured:', err);
 });
 
 mongoose.connection.on('connected', () => {
-	console.log("Mongoose connected to server:", MONGO_SERVER);
+  console.log('Mongoose connected to server:', MONGO_SERVER);
 });
 
 mongoose.connection.on('disconnected', () => {
-	console.log("Mongoose disconnected")
+  console.log('Mongoose disconnected');
 });
 
 // Handle closing the node server process
 process.on('SIGINT', () => {
-	mongoose.connection.close( () => {
-		console.log("App Terminated. Cleaning up...");
-		process.exit(0);
-	});
+  mongoose.connection.close(() => {
+    console.log('App Terminated. Cleaning up...');
+    process.exit(0);
+  });
 });
 

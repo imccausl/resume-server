@@ -1,5 +1,5 @@
 const mongoose = require('mongoose'),
-	  bulletListModel = require('./bulletListModel'),
+	  bulletListModel = require('../components/bulletListModel'),
 	  Schema = mongoose.Schema,
 	  educationModel = new Schema( {
 		
@@ -16,4 +16,4 @@ const mongoose = require('mongoose'),
 
 } );
 
-module.exports = mongoose.model('Education', educationModel, 'education');
+module.exports = educationModel;

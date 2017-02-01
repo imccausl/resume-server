@@ -3,8 +3,8 @@ const mongoose = require('mongoose'),
 	  socialFeedModel = new Schema( {
 
 
-			service: String,
-			url: String 
+			service: {type: String},
+			url: {type: String} 
 
 			
 } );

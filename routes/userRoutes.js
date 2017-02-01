@@ -1,26 +1,40 @@
 const express = require('express');
-
-const routes = function(User) {
+let routes = function routes(User, Resume) {
+	let userRouter = express.Router();
 	
-	const userRouter = express.Router();
-	
-	userRouter.route('/new')
-		.post( (res, req) => {
-			User.create( req.body,  (err, user) => {
+	userRouter.route('/register')
+		.post( (req, res) => {
+									
+			User.create( req.body, (err, user) => {
+				let userResume = {};
+				
 				if (err) {
-					res.status(500).json({'error':err});
+					res.status(500).json({'error':{'status':'500', 'message':err}});
 					console.log('An interal server error occured attempting to create a new user:', err);
 					
 					// if error code 11000, user already exists
 				} else {
-					res.status(201).json(user);
+					res.status(201).json({"data":user});
 					console.log('A new user was created successfully.');
 					console.log(user.createdOn);
 					console.log('Username:', user.username);
 					console.log("Id:", user.id);
 				}
+											
 			});
-			
+					
+				
+	});		
+		
+	userRouter.route('/:username')
+		.get( (req, res) => {
+			User.find({'username': req.params.username}, (err, user) => {
+				if(err) {
+					res.status(500).json({'error': {'status': '500', 'message':err}});
+				} else {
+					res.json({"data":user});
+				}
+			});
 		});
 	
 	
