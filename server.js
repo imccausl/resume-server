@@ -36,7 +36,7 @@ app.use(cookieParser());
 app.use(session({
 	secret: 'cve2kc8vDAVY*xgATeMx8uKR[C6CLeF3{pf?@AYkePw78z]D.MT>C^a@HBA62g3V',
 	resave: true,
-	saveUnititiaized: true
+	saveUninitialized: true
 }));
 app.use(passport.initialize());
 app.use(passport.session());

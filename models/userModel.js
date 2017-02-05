@@ -30,8 +30,9 @@ const userModel = new Schema({
 
 // encrypt password automatically when it is changed.
 
-userModel.pre('save', (done) => {
+userModel.pre('save', function(done) {
   const user = this;
+  
   if (!user.isModified('password')) { return done(); }
   bcrypt.genSalt(SALT_FACTOR, (err, salt) => {
     if (err) { return done(err); }
